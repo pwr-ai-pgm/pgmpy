@@ -80,6 +80,13 @@ class ContinuousFactor(BaseFactor):
         return self.distribution.pdf
 
     @property
+    def cdf(self):
+        """
+        Returns the cdf of the ContinuousFactor computer numerically.
+        """
+        return self.distribution.cdf
+
+    @property
     def variable(self):
         return self.scope()[0]
 

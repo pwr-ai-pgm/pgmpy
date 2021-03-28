@@ -64,6 +64,13 @@ class CustomDistribution(BaseDistribution):
         """
         return self._pdf
 
+    def cdf(self, *args):
+        return integrate.nquad(
+            self.pdf,
+            [[-np.inf, args[i]] for i in
+             range(len(self.variables))]
+        )[0]
+
     @pdf.setter
     def pdf(self, f):
         self._pdf = f
