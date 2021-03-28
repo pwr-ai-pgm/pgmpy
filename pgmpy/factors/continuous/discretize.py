@@ -69,29 +69,14 @@ class BaseDiscretizer(ABC):
         masses.
 
         Default value is the points -
-        [low, low+step, low+2*step, ......... , high-step]
+        [low, low+step, low+2*step, ......... , high]
         unless the method is overridden by a subclass.
-
-        Examples
-        --------
-        >>> from pgmpy.factors import ContinuousNode
-        >>> from pgmpy.discretize import BaseDiscretizer
-        >>> class ChildDiscretizer(BaseDiscretizer):
-        ...     def get_discrete_values(self):
-        ...         pass
-        >>> from scipy.stats import norm
-        >>> node = ContinuousNode(norm(0).pdf)
-        >>> child = ChildDiscretizer(node, -5, 5, 20)
-        >>> chld.get_labels()
-        ['x=-5.0', 'x=-4.5', 'x=-4.0', 'x=-3.5', 'x=-3.0', 'x=-2.5',
-         'x=-2.0', 'x=-1.5', 'x=-1.0', 'x=-0.5', 'x=0.0', 'x=0.5', 'x=1.0',
-         'x=1.5', 'x=2.0', 'x=2.5', 'x=3.0', 'x=3.5', 'x=4.0', 'x=4.5']
-
         """
-        step = (self.high - self.low) / self.cardinality
-        labels = [
-            f"{self.factor.variable}={str(i)}" for i in np.round(np.arange(self.low, self.high, step), 3)
-        ]
+        labels = list(
+            f"{self.factor.variable}={str(i)}"
+            for i in
+            np.round(np.linspace(self.low, self.high, self.cardinality), 3)
+        )
         return labels
 
 
@@ -136,8 +121,8 @@ class RoundingDiscretizer(BaseDiscretizer):
             - self.factor.cdf(self.low, opts=self.cdf_opts)
         ]
 
-        # for x=[low+step, low+2*step, ........., high-step]
-        points = np.linspace(self.low + step, self.high - step, self.cardinality - 1)
+        # for x=[low+step, low+2*step, ........., high]
+        points = np.linspace(self.low + step, self.high, self.cardinality - 1)
         discrete_values.extend(
             [
                 self.factor.cdf(
@@ -260,10 +245,3 @@ class UnbiasedDiscretizer(BaseDiscretizer):
         return integrate.quad(fun, -np.inf, u, **opts)[0] + np.power(u, order) * (
             1 - self.factor.cdf(u, opts=self.cdf_opts)
         )
-
-    def get_labels(self):
-        labels = list(
-            f"x={str(i)}"
-            for i in np.round(np.linspace(self.low, self.high, self.cardinality), 3)
-        )
-        return labels
