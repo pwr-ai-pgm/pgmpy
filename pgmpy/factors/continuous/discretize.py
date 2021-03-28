@@ -1,10 +1,10 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 import numpy as np
 from scipy import integrate
 
 
-class BaseDiscretizer(ABCMeta):
+class BaseDiscretizer(ABC):
     """
     Base class for the discretizer classes in pgmpy. The discretizer
     classes are used to discretize a continuous random variable
