@@ -187,7 +187,7 @@ class ContinuousFactor(BaseFactor):
         # TODO: finish this
         """
         return dict(zip(
-            method(self, *args, **kwargs).get_discrete_values(),
+            method(self, *args, **kwargs).get_labels(),
             method(self, *args, **kwargs).get_discrete_values()
         ))
 
