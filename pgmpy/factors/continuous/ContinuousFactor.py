@@ -186,7 +186,10 @@ class ContinuousFactor(BaseFactor):
         >>> dirichlet_factor.discretize(RoundingDiscretizer, low=1, high=2, cardinality=5)
         # TODO: finish this
         """
-        return method(self, *args, **kwargs).get_discrete_values()
+        return dict(zip(
+            method(self, *args, **kwargs).get_discrete_values(),
+            method(self, *args, **kwargs).get_discrete_values()
+        ))
 
     def reduce(self, values, inplace=True):
         """
