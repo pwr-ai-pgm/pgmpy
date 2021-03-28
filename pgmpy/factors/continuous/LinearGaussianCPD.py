@@ -84,6 +84,9 @@ class LinearGaussianCPD(BaseFactor):
             self.variables, pdf="gaussian", mean=self.mean, covariance=self.variance
         )
 
+    def scope(self):
+        return self.variables
+
     def sum_of_product(self, xi, xj):
         prod_xixj = xi * xj
         return np.sum(prod_xixj)
