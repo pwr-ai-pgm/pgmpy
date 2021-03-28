@@ -355,7 +355,8 @@ class VariableElimination(Inference):
         >>> inference = VariableElimination(model)
         >>> phi_query = inference.map_query(['A', 'B'])
         """
-        common_vars = set(evidence if evidence is not None else []).intersection(
+        common_vars = set(
+            evidence if evidence is not None else []).intersection(
             set(variables if variables is not None else [])
         )
         if common_vars:
@@ -363,10 +364,11 @@ class VariableElimination(Inference):
                 f"Can't have the same variables in both `variables` and `evidence`. Found in both: {common_vars}"
             )
 
-        # TODO:Check the note in docstring. Change that behavior to return the joint MAP
         final_distribution = self._variable_elimination(
-            variables=variables,
-            operation="marginalize",
+            variables=list(set(self.variables).difference(
+                set(evidence if evidence is not None else [])
+            )),
+            operation=None,
             evidence=evidence,
             elimination_order=elimination_order,
             joint=True,
@@ -935,7 +937,8 @@ class BeliefPropagation(Inference):
         >>> belief_propagation.map_query(variables=['J', 'Q'],
         ...                              evidence={'A': 0, 'R': 0, 'G': 0, 'L': 1})
         """
-        common_vars = set(evidence if evidence is not None else []).intersection(
+        common_vars = set(
+            evidence if evidence is not None else []).intersection(
             set(variables if variables is not None else [])
         )
         if common_vars:
@@ -943,15 +946,16 @@ class BeliefPropagation(Inference):
                 f"Can't have the same variables in both `variables` and `evidence`. Found in both: {common_vars}"
             )
 
-        # TODO:Check the note in docstring. Change that behavior to return the joint MAP
-        if not variables:
-            variables = set(self.variables)
+        _query_variables = set(self.variables).difference(
+            set(evidence if evidence is not None else [])
+        )
 
         final_distribution = self._query(
-            variables=variables,
+            variables=_query_variables,
             operation="marginalize",
             evidence=evidence,
             show_progress=show_progress,
+            joint=True,
         )
 
         # To handle the case when no argument is passed then
