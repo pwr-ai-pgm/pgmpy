@@ -64,11 +64,16 @@ class CustomDistribution(BaseDistribution):
         """
         return self._pdf
 
-    def cdf(self, *args):
+    def cdf(self, *args, opts=None):
         return integrate.nquad(
             self.pdf,
             [[-np.inf, args[i]] for i in
-             range(len(self.variables))]
+             range(len(self.variables))],
+            opts={
+                'epsabs': 1.49e-05,
+                'epsrel': 1.49e-05,
+                'limit': 30,
+            } if opts is None else opts
         )[0]
 
     @pdf.setter
