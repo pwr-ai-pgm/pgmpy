@@ -41,11 +41,12 @@ class BaseDiscretizer(ABC):
 
     """
 
-    def __init__(self, factor, low, high, cardinality):
+    def __init__(self, factor, low, high, cardinality, cdf_opts=None):
         self.factor = factor
         self.low = low
         self.high = high
         self.cardinality = cardinality
+        self.cdf_opts = cdf_opts
 
     @abstractmethod
     def get_discrete_values(self):
@@ -129,14 +130,20 @@ class RoundingDiscretizer(BaseDiscretizer):
 
         # for x=[low]
         discrete_values = [
-            self.factor.cdf(self.low + step / 2) - self.factor.cdf(self.low)
+            self.factor.cdf(
+                self.low + step / 2,
+                opts=self.cdf_opts)
+            - self.factor.cdf(self.low, opts=self.cdf_opts)
         ]
 
         # for x=[low+step, low+2*step, ........., high-step]
         points = np.linspace(self.low + step, self.high - step, self.cardinality - 1)
         discrete_values.extend(
             [
-                self.factor.cdf(i + step / 2) - self.factor.cdf(i - step / 2)
+                self.factor.cdf(
+                    i + step / 2,
+                    opts=self.cdf_opts
+                ) - self.factor.cdf(i - step / 2, opts=self.cdf_opts)
                 for i in points
             ]
         )
@@ -198,7 +205,7 @@ class UnbiasedDiscretizer(BaseDiscretizer):
         discrete_values = [
             (lev(self.low) - lev(self.low + step)) / step
             + 1
-            - self.factor.cdf(self.low)
+            - self.factor.cdf(self.low, opts=self.cdf_opts)
         ]
 
         # for x=[low+step, low+2*step, ........., high-step]
@@ -211,7 +218,7 @@ class UnbiasedDiscretizer(BaseDiscretizer):
         discrete_values.append(
             (lev(self.high) - lev(self.high - step)) / step
             - 1
-            + self.factor.cdf(self.high)
+            + self.factor.cdf(self.high, opts=self.cdf_opts)
         )
 
         return discrete_values
@@ -245,7 +252,7 @@ class UnbiasedDiscretizer(BaseDiscretizer):
             return np.power(x, order) * self.factor.pdf(x)
 
         return integrate.quad(fun, -np.inf, u)[0] + np.power(u, order) * (
-            1 - self.factor.cdf(u)
+            1 - self.factor.cdf(u, opts=self.cdf_opts)
         )
 
     def get_labels(self):
