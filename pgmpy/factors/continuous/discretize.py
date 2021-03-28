@@ -251,7 +251,13 @@ class UnbiasedDiscretizer(BaseDiscretizer):
         def fun(x):
             return np.power(x, order) * self.factor.pdf(x)
 
-        return integrate.quad(fun, -np.inf, u)[0] + np.power(u, order) * (
+        opts = {
+            'epsabs': 1.49e-05,
+            'epsrel': 1.49e-05,
+            'limit': 30,
+        } if self.cdf_opts is None else self.cdf_opts
+
+        return integrate.quad(fun, -np.inf, u, **opts)[0] + np.power(u, order) * (
             1 - self.factor.cdf(u, opts=self.cdf_opts)
         )
 
