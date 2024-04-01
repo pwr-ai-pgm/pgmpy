@@ -620,7 +620,7 @@ class BayesianModel(DAG):
 
             df_results = pd.DataFrame(pred_values, index=data_unique.index)
             data_with_results = pd.concat([data_unique, df_results], axis=1)
-            return data.merge(data_with_results, how="left").loc[:, missing_variables]
+            return data.merge(data_with_results, how="left").loc[:, list(missing_variables)]
 
     def predict_probability(self, data):
         """
