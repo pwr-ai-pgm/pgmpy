@@ -260,7 +260,7 @@ class DiscreteFactor(BaseFactor, StateNameMixin):
         if not all(i <= max_possible_index for i in index):
             raise IndexError("Index greater than max possible index")
 
-        assignments = np.zeros((len(index), len(self.scope())), dtype=np.int)
+        assignments = np.zeros((len(index), len(self.scope())), dtype=np.int32)
         rev_card = self.cardinality[::-1]
         for i, card in enumerate(rev_card):
             assignments[:, i] = index % card
